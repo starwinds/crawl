@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.9-slim
 
 # Set timezone to KST
 ENV TZ=Asia/Seoul
@@ -48,5 +48,13 @@ RUN mkdir -p results
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 
-# Run the crawler
-CMD ["python", "crawler.py", "--run-now"]
+# Create entrypoint script
+RUN echo '#!/bin/bash\n\
+if [ "$1" = "--run-now" ]; then\n\
+    python main.py --run-now\n\
+else\n\
+    python main.py\n\
+fi' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
+
+ENTRYPOINT ["/app/entrypoint.sh"]
+CMD []
