@@ -49,4 +49,4 @@ RUN mkdir -p results
 ENV PYTHONUNBUFFERED=1
 
 # Run the crawler
-CMD ["python", "crawler.py"]
+CMD ["python", "crawler.py", "--run-now"]
