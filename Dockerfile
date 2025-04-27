@@ -38,9 +38,6 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install Playwright browser
-RUN playwright install chromium
-
 # Copy application files
 COPY crawler.py .
 COPY config.json .
