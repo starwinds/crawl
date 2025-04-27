@@ -52,4 +52,4 @@ RUN mkdir -p results
 ENV PYTHONUNBUFFERED=1
 
 # Run the crawler
-ENTRYPOINT ["python", "crawler.py"]
+CMD ["python", "crawler.py"]
