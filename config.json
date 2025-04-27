@@ -1,0 +1,50 @@
+{
+    "naver_api": {
+        "client_id": "YOUR_NAVER_CLIENT_ID",
+        "client_secret": "YOUR_NAVER_CLIENT_SECRET"
+    },
+    "search_keywords": {
+        "tech": {
+            "keywords": ["kt cloud", "aws", "azure", "gcp", "nvidia"],
+            "max_articles": 5,
+            "channel": "tech-news"
+        },
+        "economy": {
+            "keywords": ["관세", "반도체", "주식"],
+            "max_articles": 5,
+            "channel": "economy-news"
+        },
+        "edu": {
+            "keywords": ["고교 내신", "고교 학점제", "학생부 종합 전형"],
+            "max_articles": 5,
+            "channel": "edu-news"
+        }
+    },
+    "crawler_settings": {
+        "headless": true,
+        "show_browser": false,
+        "timeout": 30000,
+        "scroll_delay": 1000,
+        "max_retries": 3
+    },
+    "output_settings": {
+        "save_dir": "results",
+        "file_format": "json",
+        "use_timestamp": true
+    },
+    "slack_settings": {
+        "enabled": true,
+        "bot_token": "YOUR_SLACK_BOT_TOKEN",
+        "channels": {
+            "tech-news": "YOUR_TECH_CHANNEL_ID",
+            "economy-news": "YOUR_ECONOMY_CHANNEL_ID",
+            "edu-news": "YOUR_EDU_CHANNEL_ID",
+            "general": "YOUR_GENERAL_CHANNEL_ID"
+        },
+        "message_format": "*{title}*\n{link}\n출처: {press}\n\n{summary}"
+    },
+    "schedule_settings": {
+        "enabled": true,
+        "execution_times": ["09:00", "15:00", "21:00"]
+    }
+} 
