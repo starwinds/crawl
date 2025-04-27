@@ -14,12 +14,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
+# Create logs directory
+RUN mkdir -p /app/logs
+
 # Create entrypoint script
 RUN echo '#!/bin/bash\n\
 if [ "$1" = "--run-now" ]; then\n\
     python crawler.py --run-now\n\
 else\n\
-    python crawler.py\n\
+    python crawler.py >> /app/logs/crawler.log 2>&1\n\
 fi' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
 
 ENTRYPOINT ["/app/entrypoint.sh"]
