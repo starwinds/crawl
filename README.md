@@ -1,72 +1,74 @@
-# Naver News Crawler
+# 네이버 뉴스 & RSS 뉴스 크롤러
 
-네이버 뉴스 API를 사용하여 뉴스를 수집하고 Slack으로 전송하는 크롤러입니다.
+네이버 뉴스 API와 RSS 피드를 사용하여 뉴스를 수집하고 Slack으로 전송하는 크롤러입니다.
 
-## 기능
+## 주요 기능
 
-- 네이버 뉴스 API를 통한 뉴스 검색
-- 카테고리별 키워드 검색
-- Slack 채널로 뉴스 전송
-- JSON 파일로 결과 저장
-- 스케줄링 기능
+1. **네이버 뉴스 크롤러**
+   - 네이버 뉴스 API를 사용하여 뉴스 수집
+   - 카테고리별 키워드 검색
+   - Slack 채널별 뉴스 전송
+   - 스케줄링된 시간에 자동 실행
 
-## 설치 방법
+2. **RSS 뉴스 크롤러**
+   - RSS 피드에서 뉴스 수집
+   - 영어 기사 자동 한글 번역
+   - Slack의 rss-news 채널로 전송
+   - 스케줄링된 시간에 자동 실행
 
-1. 저장소 클론
-```bash
-git clone https://github.com/yourusername/naver-news-crawler.git
-cd naver-news-crawler
-```
+## 설치 및 설정
 
-2. 가상환경 생성 및 활성화
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# 또는
-venv\Scripts\activate  # Windows
-```
-
-3. 필요한 패키지 설치
+1. **필요 패키지 설치**
 ```bash
 pip install -r requirements.txt
 ```
 
-## 설정 방법
+2. **설정 파일 구성**
+- `config.json` 파일에 다음 정보 설정:
+  - 네이버 API 클라이언트 ID와 시크릿
+  - Slack 봇 토큰
+  - Slack 채널 ID
+  - RSS 피드 URL 목록
+  - 스케줄 실행 시간
 
-1. `config.json` 파일을 복사하여 `config.local.json` 파일 생성
+## 실행 방법
+
+1. **테스트 모드 (즉시 실행)**
 ```bash
-cp config.json config.local.json
-```
-
-2. `config.local.json` 파일에서 다음 항목들을 실제 값으로 교체:
-   - `YOUR_NAVER_CLIENT_ID`: 네이버 개발자 센터에서 발급받은 Client ID
-   - `YOUR_NAVER_CLIENT_SECRET`: 네이버 개발자 센터에서 발급받은 Client Secret
-   - `YOUR_SLACK_BOT_TOKEN`: Slack 봇 토큰
-   - `YOUR_TECH_CHANNEL_ID`: Slack 채널 ID들
-
-## 사용 방법
-
-1. 즉시 실행
-```bash
+# 네이버 뉴스 크롤러
 python crawler.py --run-now
+
+# RSS 뉴스 크롤러
+python rss_main.py --run-now
 ```
 
-2. 스케줄 모드로 실행
+2. **스케줄 모드 (백그라운드 실행)**
 ```bash
+# 네이버 뉴스 크롤러
 python crawler.py
+
+# RSS 뉴스 크롤러
+python rss_main.py
 ```
 
-## 스케줄 설정
+3. **Docker 사용**
+```bash
+# 테스트 모드
+docker run --name news-crawler-test naver-news-crawler --run-now
 
-`config.json` 파일의 `schedule_settings` 섹션에서 실행 시간을 설정할 수 있습니다:
-
-```json
-"schedule_settings": {
-    "enabled": true,
-    "execution_times": ["09:00", "15:00", "21:00"]
-}
+# 스케줄 모드
+docker run -d --name news-crawler -v $(pwd)/logs:/app/logs naver-news-crawler
 ```
 
-## 라이선스
+## 로그 및 결과
 
-MIT License 
+- 네이버 뉴스 크롤러 로그: `crawler.log`
+- RSS 뉴스 크롤러 로그: `rss_crawler.log`
+- 수집된 뉴스 결과: `results/` 디렉토리
+
+## 주의사항
+
+1. 네이버 API 사용 시 API 키가 필요합니다.
+2. Slack 메시지 전송을 위해서는 Slack 봇 토큰이 필요합니다.
+3. RSS 피드의 영어 기사는 googletrans를 사용하여 한글로 자동 번역됩니다.
+4. Docker 사용 시 로그 파일은 호스트 시스템의 `./logs` 디렉토리에 저장됩니다. 
