@@ -20,6 +20,14 @@
             "channel": "edu-news"
         }
     },
+    "rss_settings": {
+        "enabled": true,
+        "feeds": [
+            "https://rss.hankyung.com/feed/tech",
+            "https://rss.hankyung.com/feed/economy",
+            "https://rss.hankyung.com/feed/education"
+        ]
+    },
     "crawler_settings": {
         "headless": true,
         "show_browser": false,
@@ -39,12 +47,13 @@
             "tech-news": "YOUR_TECH_CHANNEL_ID",
             "economy-news": "YOUR_ECONOMY_CHANNEL_ID",
             "edu-news": "YOUR_EDU_CHANNEL_ID",
+            "rss-news": "YOUR_RSS_CHANNEL_ID",
             "general": "YOUR_GENERAL_CHANNEL_ID"
         },
         "message_format": "*{title}*\n{link}\n출처: {press}\n\n{summary}"
     },
     "schedule_settings": {
         "enabled": true,
-        "execution_times": ["09:00", "15:00", "21:00"]
+        "execution_times": ["06:30", "18:30"]
     }
 } 
