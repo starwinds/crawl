@@ -21,8 +21,10 @@ RUN mkdir -p /app/logs
 RUN echo '#!/bin/bash\n\
 if [ "$1" = "--run-now" ]; then\n\
     python crawler.py --run-now\n\
+    python rss_main.py --run-now\n\
 else\n\
-    python crawler.py >> /app/logs/crawler.log 2>&1\n\
+    python crawler.py >> /app/logs/crawler.log 2>&1 &\n\
+    python rss_main.py >> /app/logs/rss_crawler.log 2>&1\n\
 fi' > /app/entrypoint.sh && chmod +x /app/entrypoint.sh
 
 ENTRYPOINT ["/app/entrypoint.sh"]

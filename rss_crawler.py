@@ -73,17 +73,59 @@ class RSSNewsCrawler:
     def _summarize_article(self, url: str) -> str:
         """기사 내용 요약 및 번역"""
         try:
+            logger.info(f"기사 내용 추출 시도: {url}")
             response = requests.get(url)
             response.raise_for_status()
             
             soup = BeautifulSoup(response.text, 'html.parser')
             
-            # 기사 내용 추출 (사이트에 따라 선택자 조정 필요)
-            article_content = soup.find('article') or soup.find('div', class_='article-content')
+            # 사이트별 맞춤형 선택자
+            if 'techcrunch.com' in url:
+                logger.info("TechCrunch 기사 처리 중...")
+                # TechCrunch의 기사 내용은 여러 div에 분산되어 있음
+                article_content = soup.find('div', class_='article-content')
+                if not article_content:
+                    article_content = soup.find('div', class_='content')
+                if not article_content:
+                    article_content = soup.find('div', class_='entry-content')
+            elif 'zdnet.com' in url:
+                logger.info("ZDNet 기사 처리 중...")
+                # ZDNet의 기사 내용은 여러 가능한 클래스에 있음
+                article_content = soup.find('div', class_='storyBody')
+                if not article_content:
+                    logger.info("storyBody 클래스 찾기 실패, 다음 선택자 시도...")
+                    article_content = soup.find('div', class_='article-content')
+                if not article_content:
+                    logger.info("article-content 클래스 찾기 실패, 다음 선택자 시도...")
+                    article_content = soup.find('div', class_='story-body')
+                if not article_content:
+                    logger.info("story-body 클래스 찾기 실패, 다음 선택자 시도...")
+                    article_content = soup.find('div', class_='story-body-container')
+                if not article_content:
+                    logger.info("story-body-container 클래스 찾기 실패, 다음 선택자 시도...")
+                    article_content = soup.find('article')
+                if not article_content:
+                    logger.info("article 태그 찾기 실패, 다음 선택자 시도...")
+                    # ZDNet의 경우 메인 콘텐츠가 div#content에 있을 수 있음
+                    article_content = soup.find('div', id='content')
+                if not article_content:
+                    logger.info("div#content 찾기 실패, 다음 선택자 시도...")
+                    # ZDNet의 경우 메인 콘텐츠가 div.main-content에 있을 수 있음
+                    article_content = soup.find('div', class_='main-content')
+                if not article_content:
+                    logger.info("div.main-content 찾기 실패, 다음 선택자 시도...")
+                    # ZDNet의 경우 메인 콘텐츠가 div.article-body에 있을 수 있음
+                    article_content = soup.find('div', class_='article-body')
             
             if article_content:
+                logger.info("기사 내용을 찾았습니다. 요약 생성 중...")
                 # 첫 3문단을 요약으로 사용
                 paragraphs = article_content.find_all('p')
+                if not paragraphs:
+                    logger.info("p 태그를 찾을 수 없습니다. div 내의 텍스트를 직접 추출합니다.")
+                    # p 태그가 없는 경우, div 내의 텍스트를 직접 추출
+                    paragraphs = [article_content]
+                
                 summary = ' '.join([p.text.strip() for p in paragraphs[:3]])
                 
                 # 요약이 200자 이상이면 자르기
@@ -92,9 +134,13 @@ class RSSNewsCrawler:
                 
                 # 영어인 경우 한글로 번역
                 if self._is_english(summary):
+                    logger.info("영어 기사 감지, 번역 시작...")
                     summary = self._translate_to_korean(summary)
                 
+                logger.info("기사 요약 완료")
                 return summary
+            
+            logger.warning(f"기사 내용을 찾을 수 없습니다. URL: {url}")
             return "기사 내용을 추출할 수 없습니다."
             
         except Exception as e:
