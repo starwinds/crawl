@@ -11,6 +11,7 @@ ENV PYTHONUNBUFFERED=1
 RUN apt-get update && apt-get install -y \
     build-essential \
     python3-dev \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -21,8 +22,18 @@ COPY requirements.txt .
 # Install PyTorch first
 RUN pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
 
+# Install sentence-transformers and its dependencies
+RUN pip install --no-cache-dir \
+    sentence-transformers \
+    transformers \
+    scikit-learn \
+    nltk
+
 # Install other requirements
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Download NLTK data
+RUN python -c "import nltk; nltk.download('punkt')"
 
 # Copy application code
 COPY . .
