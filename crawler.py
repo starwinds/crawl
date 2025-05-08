@@ -10,6 +10,7 @@ import logging
 from typing import List, Dict
 import requests
 from urllib.parse import quote
+from news_recommender import NewsRecommender
 
 # 로깅 설정
 logging.basicConfig(
@@ -35,6 +36,12 @@ class NaverNewsCrawler:
         if config['slack_settings']['enabled']:
             self.slack_client = WebClient(token=config['slack_settings']['bot_token'])
             self.channels = config['slack_settings']['channels']
+            # 뉴스 추천기 초기화
+            recommendation_channel = config['slack_settings']['recommendation_channel']
+            self.news_recommender = NewsRecommender(
+                self.slack_client,
+                self.channels[recommendation_channel]
+            )
         else:
             self.slack_client = None
         logger.info("크롤러 초기화 완료")
@@ -138,13 +145,21 @@ class NaverNewsCrawler:
             for category, category_config in self.config['search_keywords'].items():
                 logger.info(f"\n=== {category} 카테고리 크롤링 시작 ===")
                 
+                category_news_items = []
                 for keyword in category_config['keywords']:
                     news_items = self.search_news(
                         keyword=keyword,
                         category=category,
                         num_articles=category_config['max_articles']
                     )
+                    category_news_items.extend(news_items)
                     all_news_items.extend(news_items)
+                
+                # 카테고리별 대표 뉴스 추천
+                if category_news_items and self.slack_client:
+                    representative_news = self.news_recommender.get_representative_news(category_news_items)
+                    if representative_news:
+                        self.news_recommender.send_recommendation(representative_news)
                 
                 self.save_results(
                     [item for item in all_news_items if item['category'] == category],

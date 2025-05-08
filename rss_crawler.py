@@ -9,6 +9,7 @@ from slack_sdk.errors import SlackApiError
 import requests
 from bs4 import BeautifulSoup
 from googletrans import Translator
+from news_recommender import NewsRecommender
 
 # 로깅 설정
 logging.basicConfig(
@@ -30,6 +31,12 @@ class RSSNewsCrawler:
         if config['slack_settings']['enabled']:
             self.slack_client = WebClient(token=config['slack_settings']['bot_token'])
             self.channels = config['slack_settings']['channels']
+            # 뉴스 추천기 초기화
+            recommendation_channel = config['slack_settings']['recommendation_channel']
+            self.news_recommender = NewsRecommender(
+                self.slack_client,
+                self.channels[recommendation_channel]
+            )
         else:
             self.slack_client = None
             
@@ -192,8 +199,8 @@ class RSSNewsCrawler:
             
         except SlackApiError as e:
             logger.error(f"Slack 메시지 전송 실패: {str(e)}")
-        except KeyError:
-            logger.error("rss-news 채널이 설정되지 않았습니다. config.json 파일을 확인해주세요.")
+        except KeyError as e:
+            logger.error(f"필수 키가 누락되었습니다: {str(e)}. 뉴스 항목: {news_item}")
 
     def save_results(self, news_items: List[Dict]):
         """수집된 뉴스를 JSON 파일로 저장"""
@@ -218,6 +225,15 @@ class RSSNewsCrawler:
                 news_items = self.fetch_feed(feed_url)
                 all_news_items.extend(news_items)
                 logger.info(f"=== RSS 피드 크롤링 완료 ===\n")
+            
+            # 요약이 있는 뉴스만 필터링
+            valid_news_items = [item for item in all_news_items if item['summary'] and item['summary'] != "기사 내용을 추출할 수 없습니다."]
+            
+            # 대표 뉴스 추천
+            if valid_news_items and self.slack_client:
+                representative_news = self.news_recommender.get_representative_news(valid_news_items)
+                if representative_news:
+                    self.news_recommender.send_recommendation(representative_news)
             
             self.save_results(all_news_items)
                 
