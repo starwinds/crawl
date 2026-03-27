@@ -21,6 +21,11 @@
    - 저사양 서버 환경에 최적화
    - Slack today1pick 채널로 추천 뉴스 전송
 
+4. 뉴스 요약 리포트 자동 생성 및 GitHub Push
+   - 크롤링 결과를 Markdown 형식의 리포트로 생성
+   - GitHub Actions 또는 스케줄러를 통한 자동 업데이트
+   - GitHub Token을 활용한 안전한 리포트 Push
+
 ## 설치 방법
 
 1. 필요한 패키지 설치:
@@ -97,3 +102,5 @@ python rss_main.py
 2. Slack 메시지 전송을 위해서는 Slack 봇 토큰이 필요합니다.
 3. RSS 피드의 영어 기사는 googletrans를 사용하여 한글로 자동 번역됩니다.
 4. Docker 사용 시 로그 파일은 호스트 시스템의 `./logs` 디렉토리에 저장됩니다. 
+## 리포트 목록
+- [2026-03-27 리포트](reports/report_2026-03-27.md)
