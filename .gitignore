@@ -41,4 +41,4 @@ results/
 .env
 
 # Config files with sensitive information
-config.local.json 
+config.local.json config/secrets.toml
