@@ -103,6 +103,7 @@ python rss_main.py
 3. RSS 피드의 영어 기사는 googletrans를 사용하여 한글로 자동 번역됩니다.
 4. Docker 사용 시 로그 파일은 호스트 시스템의 `./logs` 디렉토리에 저장됩니다. 
 ## 리포트 목록
+- [2026-04-02 리포트](reports/report_2026-04-02.md)
 - [2026-04-01 리포트](reports/report_2026-04-01.md)
 - [2026-03-30 리포트](reports/report_2026-03-30.md)
 - [2026-03-28 리포트](reports/report_2026-03-28.md)
